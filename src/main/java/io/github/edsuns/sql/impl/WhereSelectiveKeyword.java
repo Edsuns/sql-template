@@ -8,6 +8,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -25,8 +26,8 @@ class WhereSelectiveKeyword<T, Q> implements Keyword<Q> {
     private final Map<String, Field> queryFields;
 
     public WhereSelectiveKeyword(Collection<Field> entityFields, Collection<Field> queryFields) {
-        this.entityFields = entityFields.stream().collect(Collectors.toMap(SqlUtil::getColumnName, x -> x));
-        this.queryFields = queryFields.stream().collect(Collectors.toMap(SqlUtil::getColumnName, x -> x));
+        this.entityFields = entityFields.stream().collect(Collectors.toMap(SqlUtil::getColumnName, x -> x, (a, b) -> a, TreeMap::new));
+        this.queryFields = queryFields.stream().collect(Collectors.toMap(SqlUtil::getColumnName, x -> x, (a, b) -> a, TreeMap::new));
     }
 
     @Override
