@@ -41,7 +41,9 @@ class SqlTemplateTest {
     @Test
     void testFullSelectAndUpdate() {
         SqlTemplate<Book, BookQuery, Long> update = update(Book.class, BookQuery.class).ignore().lowPriority()
-                .set(x -> x.assign(Book::getId, o -> 1).assign(Book::getName, BookQuery::getName))
+                .set(x -> x.assign(Book::getId, o -> 1)
+                        .assign(Book::getName, BookQuery::getName)
+                        .assign(Book::getPrice, SqlTemplates::nullValue))
                 .where(x -> x
                         .in(Book::getName, BookQuery::getNames)
                         .like(Book::getName, BookQuery::getNameLike).or().equals(Book::getPrice, BookQuery::getPrice)
@@ -72,7 +74,7 @@ class SqlTemplateTest {
         query.setNameLike("test");
         query.setNames(Arrays.asList("1", "2", "3"));
         query.setLimit(15L);
-        assertEquals("UPDATE LOW_PRIORITY IGNORE `book` SET `id`=?, `name`=? WHERE `name` IN (?,?,?) AND `name` LIKE ?",
+        assertEquals("UPDATE LOW_PRIORITY IGNORE `book` SET `id`=?, `name`=?, `price`=NULL WHERE `name` IN (?,?,?) AND `name` LIKE ?",
                 update.generateSql(entity, query).getSqlTemplateString());
         assertEquals("SELECT DISTINCT `id`,`name`,`price` FROM `book` WHERE (`name` IN (?,?,?) AND `name` LIKE ? OR (`name`=?))" +
                         " AND (`id`=? AND `name`=?) GROUP BY `name`,`price` HAVING `name`=? ORDER BY `id` LIMIT 15",

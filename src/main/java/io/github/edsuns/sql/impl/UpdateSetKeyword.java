@@ -43,18 +43,17 @@ class UpdateSetKeyword<T extends Entity, Q extends Query> implements Keyword<Q>,
         sql.append(KEY_WORD);
         boolean affected = false;
         Iterator<SerializableFunction<Q, ?>> iterator = queryFields.iterator();
-        for (String columnNames : columnNames) {
+        for (String columnName : columnNames) {
             SerializableFunction<Q, ?> field = requireNonNull(iterator.next());
-            Object var = field.apply(query);
-            if (var != null) {
-                if (affected) {
-                    sql.append(',');
-                }
-                sql.append(' ');
-                sql.append(columnNames).append('=').append(SqlTemplate.PLACEHOLDER);
-                variableConsumer.accept(var);
-                affected = true;
+            Object val = field.apply(query);
+
+            if (affected) {
+                sql.append(',');
             }
+            sql.append(' ');
+            sql.append(columnName).append('=').append(val != null ? SqlTemplate.PLACEHOLDER : NullKeyword.KEY_WORD);
+            variableConsumer.accept(val != null ? val : NullKeyword.INSTANCE);
+            affected = true;
         }
         return affected;
     }

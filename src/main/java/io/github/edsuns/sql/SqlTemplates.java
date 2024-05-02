@@ -33,4 +33,8 @@ public class SqlTemplates {
         SelectTemplate<T, Q> template = new SelectTemplateImpl<>(entity, query);
         return template.select(entity, columns);
     }
+
+    public static <Q extends Query, X> X nullValue(Q query) {
+        return null;
+    }
 }

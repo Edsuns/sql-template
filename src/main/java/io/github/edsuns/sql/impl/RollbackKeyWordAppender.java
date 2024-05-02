@@ -28,8 +28,10 @@ class RollbackKeyWordAppender<Q> {
         Queue<Object> variables = new ArrayDeque<>();
         boolean affected = keyword.parseIntoSql(sql, variables::add, query);
         if (affected) {
-            for (Object var : variables) {
-                variableConsumer.accept(var);
+            for (Object val : variables) {
+                if (val != NullKeyword.KEY_WORD) {
+                    variableConsumer.accept(val);
+                }
             }
         }
         return affected;
@@ -39,8 +41,8 @@ class RollbackKeyWordAppender<Q> {
         this.beforeIndex[0] = sql.length();
     }
 
-    public void mark(int key) {
-        this.beforeIndex[key] = sql.length();
+    public void mark(int savepoint) {
+        this.beforeIndex[savepoint] = sql.length();
     }
 
     public void rollback() {
@@ -49,9 +51,9 @@ class RollbackKeyWordAppender<Q> {
         }
     }
 
-    public void rollback(int key) {
-        if (beforeIndex[key] < sql.length()) {
-            sql.delete(beforeIndex[key], sql.length());
+    public void rollback(int savepoint) {
+        if (beforeIndex[savepoint] < sql.length()) {
+            sql.delete(beforeIndex[savepoint], sql.length());
         }
     }
 }
