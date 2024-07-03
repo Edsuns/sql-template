@@ -15,13 +15,13 @@ import static io.github.edsuns.sql.util.SqlUtil.appendAndIfNotPresent;
  * @since 2024/3/21 14:15
  */
 @ParametersAreNonnullByDefault
-class WhereLikeKeyword<T extends Entity, Q, X> extends AbstractKeyword<T, Q, X> implements WhereCondition {
+class WhereLikeKeyword<T extends Entity, Q, X> extends AbstractConditionKeyword<T, Q, X> implements WhereCondition {
     public static final String KEY_WORD = "LIKE";
 
     private final boolean prefixMatching;
 
-    protected WhereLikeKeyword(SerializableFunction<T, X> entityField, SerializableFunction<Q, X> queryField, boolean prefixMatching) {
-        super(entityField, queryField);
+    protected WhereLikeKeyword(SerializableFunction<T, X> entityField, SerializableFunction<Q, X> queryField, boolean prefixMatching, boolean selective) {
+        super(entityField, queryField, selective);
         this.prefixMatching = prefixMatching;
     }
 

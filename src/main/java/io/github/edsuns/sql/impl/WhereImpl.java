@@ -20,42 +20,67 @@ abstract class WhereImpl<T extends Entity, Q extends Query> implements Keyword<T
 
     protected final Queue<Keyword<T, Q>> keywords;
 
-    public WhereImpl(Queue<Keyword<T, Q>> keywords) {
+    WhereImpl(Queue<Keyword<T, Q>> keywords) {
         this.keywords = keywords;
     }
 
     @Override
     public <X> Where<T, Q> equals(SerializableFunction<T, X> field, SerializableFunction<Q, X> val) {
-        keywords.add(new WhereCompareKeyword<>(field, val, '='));
+        return this.equals(field, val, false);
+    }
+
+    @Override
+    public <X> Where<T, Q> equals(SerializableFunction<T, X> field, SerializableFunction<Q, X> val, boolean selective) {
+        keywords.add(new WhereCompareKeyword<>(field, val, '=', selective));
         return this;
     }
 
     @Override
     public <X> Where<T, Q> greater(SerializableFunction<T, X> field, SerializableFunction<Q, X> val) {
-        keywords.add(new WhereCompareKeyword<>(field, val, '>'));
+        return this.greater(field, val, false);
+    }
+
+    @Override
+    public <X> Where<T, Q> greater(SerializableFunction<T, X> field, SerializableFunction<Q, X> val, boolean selective) {
+        keywords.add(new WhereCompareKeyword<>(field, val, '>', selective));
         return this;
     }
 
     @Override
     public <X> Where<T, Q> less(SerializableFunction<T, X> field, SerializableFunction<Q, X> val) {
-        keywords.add(new WhereCompareKeyword<>(field, val, '<'));
+        return this.less(field, val, false);
+    }
+
+    @Override
+    public <X> Where<T, Q> less(SerializableFunction<T, X> field, SerializableFunction<Q, X> val, boolean selective) {
+        keywords.add(new WhereCompareKeyword<>(field, val, '<', selective));
         return this;
     }
 
     @Override
     public <X> Where<T, Q> like(SerializableFunction<T, X> field, SerializableFunction<Q, X> val) {
-        return this.like(field, val, false);
+        return this.like(field, val, false, false);
     }
 
     @Override
-    public <X> Where<T, Q> like(SerializableFunction<T, X> field, SerializableFunction<Q, X> val, boolean prefixMatching) {
-        keywords.add(new WhereLikeKeyword<>(field, val, prefixMatching));
+    public <X> Where<T, Q> like(SerializableFunction<T, X> field, SerializableFunction<Q, X> val, boolean selective) {
+        return this.like(field, val, false, selective);
+    }
+
+    @Override
+    public <X> Where<T, Q> like(SerializableFunction<T, X> field, SerializableFunction<Q, X> val, boolean prefixMatching, boolean selective) {
+        keywords.add(new WhereLikeKeyword<>(field, val, prefixMatching, selective));
         return this;
     }
 
     @Override
     public <X> Where<T, Q> in(SerializableFunction<T, X> field, SerializableFunction<Q, List<X>> val) {
-        keywords.add(new WhereInKeyword<>(field, val));
+        return this.in(field, val, false);
+    }
+
+    @Override
+    public <X> Where<T, Q> in(SerializableFunction<T, X> field, SerializableFunction<Q, List<X>> val, boolean selective) {
+        keywords.add(new WhereInKeyword<>(field, val, selective));
         return this;
     }
 

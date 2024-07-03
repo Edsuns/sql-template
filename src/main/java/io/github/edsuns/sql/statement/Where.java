@@ -23,15 +23,25 @@ public interface Where<T extends Entity, Q extends Query> extends SqlTemplateBui
 
     <X> Where<T, Q> equals(SerializableFunction<T, X> field, SerializableFunction<Q, X> val);
 
+    <X> Where<T, Q> equals(SerializableFunction<T, X> field, SerializableFunction<Q, X> val, boolean selective);
+
     <X> Where<T, Q> greater(SerializableFunction<T, X> field, SerializableFunction<Q, X> val);
+
+    <X> Where<T, Q> greater(SerializableFunction<T, X> field, SerializableFunction<Q, X> val, boolean selective);
 
     <X> Where<T, Q> less(SerializableFunction<T, X> field, SerializableFunction<Q, X> val);
 
+    <X> Where<T, Q> less(SerializableFunction<T, X> field, SerializableFunction<Q, X> val, boolean selective);
+
     <X> Where<T, Q> like(SerializableFunction<T, X> field, SerializableFunction<Q, X> val);
 
-    <X> Where<T, Q> like(SerializableFunction<T, X> field, SerializableFunction<Q, X> val, boolean prefixMatching);
+    <X> Where<T, Q> like(SerializableFunction<T, X> field, SerializableFunction<Q, X> val, boolean selective);
+
+    <X> Where<T, Q> like(SerializableFunction<T, X> field, SerializableFunction<Q, X> val, boolean prefixMatching, boolean selective);
 
     <X> Where<T, Q> in(SerializableFunction<T, X> field, SerializableFunction<Q, List<X>> val);
+
+    <X> Where<T, Q> in(SerializableFunction<T, X> field, SerializableFunction<Q, List<X>> val, boolean selective);
 
     Where<T, Q> or();
 

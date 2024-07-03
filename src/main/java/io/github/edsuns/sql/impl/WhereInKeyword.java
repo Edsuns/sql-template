@@ -21,8 +21,8 @@ import static io.github.edsuns.sql.util.SqlUtil.appendAndIfNotPresent;
 @ParametersAreNonnullByDefault
 class WhereInKeyword<T extends Entity, Q, X> extends AbstractListFieldKeyword<T, Q, X> implements WhereCondition {
 
-    public WhereInKeyword(SerializableFunction<T, X> entityField, SerializableFunction<Q, List<X>> queryField) {
-        super(entityField, queryField);
+    public WhereInKeyword(SerializableFunction<T, X> entityField, SerializableFunction<Q, List<X>> queryField, boolean selective) {
+        super(entityField, queryField, selective);
     }
 
     @Override

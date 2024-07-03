@@ -13,15 +13,17 @@ import java.util.function.Consumer;
  * @since 2024/3/21 13:56
  */
 @ParametersAreNonnullByDefault
-abstract class AbstractKeyword<T extends Entity, Q, X> implements Keyword<T, Q> {
+abstract class AbstractConditionKeyword<T extends Entity, Q, X> implements Keyword<T, Q> {
     protected final SerializableFunction<T, X> entityField;
     protected final SerializableFunction<Q, X> queryField;
     protected final String columnName;
+    protected final boolean selective;
 
-    protected AbstractKeyword(SerializableFunction<T, X> entityField, SerializableFunction<Q, X> queryField) {
+    protected AbstractConditionKeyword(SerializableFunction<T, X> entityField, SerializableFunction<Q, X> queryField, boolean selective) {
         this.entityField = entityField;
         this.queryField = queryField;
         this.columnName = SqlUtil.getColumnName(entityField);
+        this.selective = selective;
     }
 
     @Override
@@ -31,7 +33,11 @@ abstract class AbstractKeyword<T extends Entity, Q, X> implements Keyword<T, Q> 
         }
         X fieldValue = queryField.apply(query);
         if (fieldValue == null) {
-            throw new IllegalArgumentException("field required in query object: " + columnName);
+            if (selective) {
+                return false;
+            } else {
+                throw new IllegalArgumentException("field required in query object: " + columnName);
+            }
         }
         parseIntoSql(fieldValue, sql, variableConsumer);
         acceptVar(variableConsumer, fieldValue);

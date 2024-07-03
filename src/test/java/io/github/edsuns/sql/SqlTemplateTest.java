@@ -28,7 +28,7 @@ class SqlTemplateTest {
 
         ReadStatement<Book, BookQuery, Book> select1 = select(Book.class, BookQuery.class)
                 .whereSelective()
-                .where(x -> x.equals(Book::getName, BookQuery::getName))
+                .where(x -> x.equals(Book::getName, BookQuery::getName, true))
                 .onlyOne();
         assertEquals("SELECT `id`,`name`,`price` FROM `book`",
                 select1.generateSql(query).getSqlTemplateString());
@@ -57,7 +57,7 @@ class SqlTemplateTest {
                 .whereSelective()
                 .where(x -> x
                         .in(Book::getName, BookQuery::getNames)
-                        .like(Book::getName, BookQuery::getNameLike).or().equals(Book::getPrice, BookQuery::getPrice)
+                        .like(Book::getName, BookQuery::getNameLike).or().equals(Book::getPrice, BookQuery::getPrice, true)
                         .or(y -> y.equals(Book::getName, BookQuery::getName))
                 )
                 .groupBy(Arrays.asList(Book::getName, Book::getPrice), having -> having.equals(Book::getName, BookQuery::getName))
@@ -85,29 +85,30 @@ class SqlTemplateTest {
     }
 
     @Test
-    void selectAllFieldRequired() {
+    void allFieldRequiredWhenSelect() {
         BookQuery query = new BookQuery();
         query.setId(1L);
         query.setNameLike("test");
         query.setNames(Arrays.asList("1", "2", "3"));
         query.setLimit(15L);
-        ReadStatement<Book, BookQuery, List<Book>> select = select(Book.class, BookQuery.class).distinct()
+        ReadStatement<Book, BookQuery, List<Book>> selectSelectiveKeyword = select(Book.class, BookQuery.class).distinct()
                 .whereSelective()
+                .where(x -> x.equals(Book::getName, BookQuery::getName, true).in(Book::getName, BookQuery::getNames))
+                .list();
+        assertEquals("SELECT DISTINCT `id`,`name`,`price` FROM `book` WHERE (`name` IN (?,?,?)) AND (`id`=?)",
+                selectSelectiveKeyword.generateSql(query).getSqlTemplateString());
+
+        ReadStatement<Book, BookQuery, List<Book>> select = select(Book.class, BookQuery.class).distinct()
                 .where(x -> x
                         .in(Book::getName, BookQuery::getNames)
-                        .like(Book::getName, BookQuery::getNameLike).or().equals(Book::getPrice, BookQuery::getPrice)
                         .or(y -> y.equals(Book::getName, BookQuery::getName))
                 )
-                .groupBy(Arrays.asList(Book::getName, Book::getPrice), having -> having.equals(Book::getName, BookQuery::getName))
-                .orderBy(x -> x.asc(Book::getId))
-                .limit(BookQuery::getLimit)
                 .list();
 
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () -> select.generateSql(query));
         assertEquals("field required in query object: `name`", ex.getMessage());
         query.setName("test");
-        assertEquals("SELECT DISTINCT `id`,`name`,`price` FROM `book` WHERE (`name` IN (?,?,?) AND `name` LIKE ? OR (`name`=?))" +
-                        " AND (`id`=? AND `name`=?) GROUP BY `name`,`price` HAVING `name`=? ORDER BY `id` LIMIT 15",
+        assertEquals("SELECT DISTINCT `id`,`name`,`price` FROM `book` WHERE `name` IN (?,?,?) OR (`name`=?)",
                 select.generateSql(query).getSqlTemplateString());
     }
 

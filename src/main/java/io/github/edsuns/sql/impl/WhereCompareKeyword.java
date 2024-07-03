@@ -15,11 +15,11 @@ import static io.github.edsuns.sql.util.SqlUtil.appendAndIfNotPresent;
  * @since 2024/3/21 14:13
  */
 @ParametersAreNonnullByDefault
-class WhereCompareKeyword<T extends Entity, Q, X> extends AbstractKeyword<T, Q, X> implements WhereCondition {
+class WhereCompareKeyword<T extends Entity, Q, X> extends AbstractConditionKeyword<T, Q, X> implements WhereCondition {
     private final char expression;
 
-    protected WhereCompareKeyword(SerializableFunction<T, X> entityField, SerializableFunction<Q, X> queryField, char expression) {
-        super(entityField, queryField);
+    protected WhereCompareKeyword(SerializableFunction<T, X> entityField, SerializableFunction<Q, X> queryField, char expression, boolean selective) {
+        super(entityField, queryField, selective);
         this.expression = expression;
     }
 

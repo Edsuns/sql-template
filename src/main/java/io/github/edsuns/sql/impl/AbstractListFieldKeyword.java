@@ -18,11 +18,13 @@ abstract class AbstractListFieldKeyword<T extends Entity, Q, X> implements Keywo
     protected final SerializableFunction<T, X> entityField;
     protected final SerializableFunction<Q, List<X>> queryField;
     protected final String columnName;
+    protected final boolean selective;
 
-    public AbstractListFieldKeyword(SerializableFunction<T, X> entityField, SerializableFunction<Q, List<X>> queryField) {
+    AbstractListFieldKeyword(SerializableFunction<T, X> entityField, SerializableFunction<Q, List<X>> queryField, boolean selective) {
         this.entityField = entityField;
         this.queryField = queryField;
         this.columnName = SqlUtil.getColumnName(entityField);
+        this.selective = selective;
     }
 
     @Override
@@ -32,7 +34,11 @@ abstract class AbstractListFieldKeyword<T extends Entity, Q, X> implements Keywo
         }
         List<X> fieldValue = queryField.apply(query);
         if (fieldValue == null) {
-            return false;
+            if (selective) {
+                return false;
+            } else {
+                throw new IllegalArgumentException("field required in query object: " + columnName);
+            }
         }
         parseIntoSql(fieldValue, sql, variableConsumer);
         acceptVar(variableConsumer, fieldValue);

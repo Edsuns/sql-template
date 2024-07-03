@@ -48,7 +48,12 @@ class SqlTemplateImpl<T extends Entity, Q extends Query, R> implements ReadState
 
     @Override
     public R execute(SqlExecutor executor, @Nullable Q query) {
-        Sql sql = generateSql(query);
+        return this.execute(executor, null, query);
+    }
+
+    @Override
+    public R execute(SqlExecutor executor, @Nullable T entity, @Nullable Q query) {
+        Sql sql = generateSql(entity, query);
         List<R> result = executor.read(sql.getSqlTemplateString(), sql.getVariables(), requireNonNull(resultClass));
         return result == null || result.isEmpty() ? null : result.get(0);
     }
