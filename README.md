@@ -26,7 +26,7 @@ public interface BookDatabase {
             .whereSelective()
             .where(x -> x.like(Book::getDescription, BookQuery::getDescriptionLike))
             .list();
-    ReadStatement<Book, BookQuery, Long> UPDATE = update(Book.class, BookQuery.class)
+    WriteStatement<Book, BookQuery, Long> UPDATE = update(Book.class, BookQuery.class)
             .setSelective()
             .where(x -> x.equals(Book::getName, BookQuery::getName, true))// query by name selective
             .affected();
