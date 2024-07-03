@@ -1,5 +1,6 @@
 package io.github.edsuns.sql.impl;
 
+import io.github.edsuns.sql.protocol.Entity;
 import io.github.edsuns.sql.util.SerializableFunction;
 
 import javax.annotation.Nullable;
@@ -13,7 +14,7 @@ import static io.github.edsuns.sql.util.SqlUtil.appendSpaceIfNotPresent;
  * @since 2024/3/21 19:28
  */
 @ParametersAreNonnullByDefault
-class LimitKeyword<Q, X extends Number> implements Keyword<Q> {
+class LimitKeyword<T extends Entity, Q, X extends Number> implements Keyword<T, Q> {
     public static final String KEYWORD = "LIMIT";
 
     @Nullable

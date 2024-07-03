@@ -15,8 +15,8 @@ import java.util.function.Consumer;
  * @since 2024/3/21 15:13
  */
 @ParametersAreNonnullByDefault
-class WhereInnerImpl<T extends Entity, Q extends Query> extends WhereImpl<T, Q> implements Keyword<Q> {
-    public WhereInnerImpl(Queue<Keyword<Q>> keyWords) {
+class WhereInnerImpl<T extends Entity, Q extends Query> extends WhereImpl<T, Q> {
+    public WhereInnerImpl(Queue<Keyword<T, Q>> keyWords) {
         super(keyWords);
     }
 
@@ -25,27 +25,27 @@ class WhereInnerImpl<T extends Entity, Q extends Query> extends WhereImpl<T, Q> 
         if (query == null) {
             return false;
         }
-        RollbackKeyWordAppender<Q> appender = new RollbackKeyWordAppender<>(sql);
+        RollbackKeyWordAppender<T, Q> appender = new RollbackKeyWordAppender<>(sql);
         boolean affected = false;
-        Iterator<Keyword<Q>> iterator = keywords.iterator();
+        Iterator<Keyword<T, Q>> iterator = keywords.iterator();
         while (iterator.hasNext()) {
-            Keyword<Q> next = iterator.next();
+            Keyword<T, Q> next = iterator.next();
             if (next instanceof WhereAndOrKeyword) {
                 if (!iterator.hasNext()) {
                     break;
                 }
-                Keyword<Q> prev = next;
+                Keyword<T, Q> prev = next;
                 next = iterator.next();
                 if (next instanceof WhereCondition) {
                     appender.mark();
-                    appender.append(prev, query, variableConsumer);
-                    if (!appender.append(next, query, variableConsumer)) {
+                    appender.append(prev, null, query, variableConsumer);
+                    if (!appender.append(next, null, query, variableConsumer)) {
                         appender.rollback();
                     }
                     continue;
                 }
             }
-            if (appender.append(next, query, variableConsumer)) {
+            if (appender.append(next, null, query, variableConsumer)) {
                 affected = true;
             }
         }

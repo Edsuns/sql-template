@@ -1,5 +1,6 @@
 package io.github.edsuns.sql.impl;
 
+import io.github.edsuns.sql.protocol.Entity;
 import io.github.edsuns.sql.util.SerializableFunction;
 import io.github.edsuns.sql.util.SqlUtil;
 
@@ -13,7 +14,7 @@ import java.util.function.Consumer;
  * @since 2024/3/21 18:14
  */
 @ParametersAreNonnullByDefault
-abstract class AbstractListFieldKeyword<T, Q, X> implements Keyword<Q> {
+abstract class AbstractListFieldKeyword<T extends Entity, Q, X> implements Keyword<T, Q> {
     protected final SerializableFunction<T, X> entityField;
     protected final SerializableFunction<Q, List<X>> queryField;
     protected final String columnName;

@@ -1,5 +1,6 @@
 package io.github.edsuns.sql.impl;
 
+import io.github.edsuns.sql.protocol.Entity;
 import io.github.edsuns.sql.protocol.SqlTemplate;
 import io.github.edsuns.sql.statement.WhereCondition;
 import io.github.edsuns.sql.util.SerializableFunction;
@@ -14,7 +15,7 @@ import static io.github.edsuns.sql.util.SqlUtil.appendAndIfNotPresent;
  * @since 2024/3/21 14:13
  */
 @ParametersAreNonnullByDefault
-class WhereCompareKeyword<T, Q, X> extends AbstractKeyword<T, Q, X> implements WhereCondition {
+class WhereCompareKeyword<T extends Entity, Q, X> extends AbstractKeyword<T, Q, X> implements WhereCondition {
     private final char expression;
 
     protected WhereCompareKeyword(SerializableFunction<T, X> entityField, SerializableFunction<Q, X> queryField, char expression) {

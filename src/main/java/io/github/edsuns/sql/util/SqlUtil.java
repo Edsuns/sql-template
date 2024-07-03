@@ -166,6 +166,7 @@ public final class SqlUtil {
      * @param f field descriptor
      * @return value, maybe a boxed primitive
      */
+    @Nullable
     public static Object value(Object o, Field f) {
         // Try 1. Get with Reflection:
         try {

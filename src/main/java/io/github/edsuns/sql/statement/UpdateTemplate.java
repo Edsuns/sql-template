@@ -22,7 +22,9 @@ public interface UpdateTemplate<T extends Entity, Q extends Query> extends SqlTe
 
     UpdateTemplate<T, Q> update(Class<T> entity);
 
-    <X> UpdateTemplate<T, Q> set(Consumer<UpdateSet<T, Q>> setters);
+    UpdateTemplate<T, Q> set(Consumer<UpdateSet<T, Q>> setters);
+
+    UpdateTemplate<T, Q> setSelective();
 
     UpdateTemplate<T, Q> ignore();
 

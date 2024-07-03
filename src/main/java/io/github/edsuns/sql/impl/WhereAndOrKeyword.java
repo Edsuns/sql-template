@@ -1,5 +1,7 @@
 package io.github.edsuns.sql.impl;
 
+import io.github.edsuns.sql.protocol.Entity;
+
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.function.Consumer;
@@ -12,7 +14,7 @@ import static io.github.edsuns.sql.util.SqlUtil.appendOrIfNotPresent;
  * @since 2024/3/21 14:21
  */
 @ParametersAreNonnullByDefault
-class WhereAndOrKeyword<T, Q, X> implements Keyword<Q> {
+class WhereAndOrKeyword<T extends Entity, Q, X> implements Keyword<T, Q> {
     private final boolean and;
 
     public WhereAndOrKeyword(boolean and) {

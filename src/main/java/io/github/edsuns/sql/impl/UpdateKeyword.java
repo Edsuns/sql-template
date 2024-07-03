@@ -1,5 +1,6 @@
 package io.github.edsuns.sql.impl;
 
+import io.github.edsuns.sql.protocol.Entity;
 import io.github.edsuns.sql.statement.UpdateTemplate;
 
 import javax.annotation.Nullable;
@@ -13,7 +14,7 @@ import static io.github.edsuns.sql.util.SqlUtil.appendSpaceIfNotPresent;
  * @since 2024/3/21 20:51
  */
 @ParametersAreNonnullByDefault
-class UpdateKeyword<T, Q, X> implements Keyword<Q> {
+class UpdateKeyword<T extends Entity, Q, X> implements Keyword<T, Q> {
     private final String tableName;
     private final boolean lowPriority;
     private final boolean ignore;

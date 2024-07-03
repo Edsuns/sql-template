@@ -20,7 +20,7 @@ import static java.util.Objects.requireNonNull;
  * @since 2024/3/21 19:23
  */
 @ParametersAreNonnullByDefault
-class OrderByKeyword<T extends Entity, Q extends Query> implements Keyword<Q>, OrderBy<T> {
+class OrderByKeyword<T extends Entity, Q extends Query> implements Keyword<T, Q>, OrderBy<T> {
 
     private final Queue<String> columns;
     private final Queue<Boolean> desc;

@@ -16,11 +16,11 @@ import java.util.function.Consumer;
  * @since 2023/05/31 15:38
  */
 @ParametersAreNonnullByDefault
-class WhereImpl<T extends Entity, Q extends Query> implements Where<T, Q> {
+abstract class WhereImpl<T extends Entity, Q extends Query> implements Keyword<T, Q>, Where<T, Q> {
 
-    protected final Queue<Keyword<Q>> keywords;
+    protected final Queue<Keyword<T, Q>> keywords;
 
-    public WhereImpl(Queue<Keyword<Q>> keywords) {
+    public WhereImpl(Queue<Keyword<T, Q>> keywords) {
         this.keywords = keywords;
     }
 

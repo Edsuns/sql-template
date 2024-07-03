@@ -1,5 +1,6 @@
 package io.github.edsuns.sql.impl;
 
+import io.github.edsuns.sql.protocol.Entity;
 import io.github.edsuns.sql.statement.SelectTemplate;
 
 import javax.annotation.Nullable;
@@ -11,7 +12,7 @@ import java.util.function.Consumer;
  * @since 2024/3/21 18:04
  */
 @ParametersAreNonnullByDefault
-class SelectFromKeyword<T, Q, X> implements Keyword<Q> {
+class SelectFromKeyword<T extends Entity, Q, X> implements Keyword<T, Q> {
     private final String tableName;
     private final String selectExpressions;
     private final boolean all;

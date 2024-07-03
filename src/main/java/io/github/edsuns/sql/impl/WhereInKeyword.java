@@ -1,5 +1,6 @@
 package io.github.edsuns.sql.impl;
 
+import io.github.edsuns.sql.protocol.Entity;
 import io.github.edsuns.sql.protocol.SqlTemplate;
 import io.github.edsuns.sql.statement.WhereCondition;
 import io.github.edsuns.sql.util.SerializableFunction;
@@ -18,7 +19,7 @@ import static io.github.edsuns.sql.util.SqlUtil.appendAndIfNotPresent;
  * @since 2024/3/21 14:16
  */
 @ParametersAreNonnullByDefault
-class WhereInKeyword<T, Q, X> extends AbstractListFieldKeyword<T, Q, X> implements WhereCondition {
+class WhereInKeyword<T extends Entity, Q, X> extends AbstractListFieldKeyword<T, Q, X> implements WhereCondition {
 
     public WhereInKeyword(SerializableFunction<T, X> entityField, SerializableFunction<Q, List<X>> queryField) {
         super(entityField, queryField);

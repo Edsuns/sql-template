@@ -12,7 +12,7 @@ import java.util.Queue;
  */
 @ParametersAreNonnullByDefault
 class CountSqlTemplateImpl<T extends Entity, Q extends Query> extends SqlTemplateImpl<T, Q, Long> {
-    public CountSqlTemplateImpl(Queue<Keyword<Q>> keywords) {
+    public CountSqlTemplateImpl(Queue<Keyword<T, Q>> keywords) {
         super(keywords, Long.class);
     }
 }

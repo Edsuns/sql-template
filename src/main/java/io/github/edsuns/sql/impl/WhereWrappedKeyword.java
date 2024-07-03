@@ -1,5 +1,6 @@
 package io.github.edsuns.sql.impl;
 
+import io.github.edsuns.sql.protocol.Entity;
 import io.github.edsuns.sql.statement.Where;
 
 import javax.annotation.Nullable;
@@ -13,23 +14,23 @@ import static io.github.edsuns.sql.util.SqlUtil.*;
  * @since 2024/3/21 14:52
  */
 @ParametersAreNonnullByDefault
-class WhereWrappedKeyword<T, Q, X> implements Keyword<Q> {
+class WhereWrappedKeyword<T extends Entity, Q, X> implements Keyword<T, Q> {
     @Nullable
-    protected final Keyword<Q> inner;
+    protected final Keyword<T, Q> inner;
     @Nullable
-    protected Keyword<Q> whereSelective;
+    protected Keyword<T, Q> whereSelective;
     protected final boolean requireBraces;
     protected final boolean appendWhere;
     protected final boolean andOr;
 
-    protected WhereWrappedKeyword(@Nullable Keyword<Q> inner, boolean requireBraces, boolean appendWhere, boolean andOr) {
+    protected WhereWrappedKeyword(@Nullable Keyword<T, Q> inner, boolean requireBraces, boolean appendWhere, boolean andOr) {
         this.inner = inner;
         this.requireBraces = requireBraces;
         this.appendWhere = appendWhere;
         this.andOr = andOr;
     }
 
-    public void setWhereSelective(Keyword<Q> whereSelective) {
+    public void setWhereSelective(Keyword<T, Q> whereSelective) {
         this.whereSelective = whereSelective;
     }
 
@@ -38,7 +39,7 @@ class WhereWrappedKeyword<T, Q, X> implements Keyword<Q> {
         if (query == null) {
             return false;
         }
-        RollbackKeyWordAppender<Q> appender = new RollbackKeyWordAppender<>(sql);
+        RollbackKeyWordAppender<T, Q> appender = new RollbackKeyWordAppender<>(sql);
 
         appendSpaceIfNotPresent(sql);
         if (appendWhere) {
@@ -53,7 +54,7 @@ class WhereWrappedKeyword<T, Q, X> implements Keyword<Q> {
         }
         int openIndex = sql.length();
         sql.append('(');
-        boolean innerAffected = inner != null && appender.append(inner, query, variableConsumer);
+        boolean innerAffected = inner != null && appender.append(inner, null, query, variableConsumer);
         int closeIndex = sql.length();
         sql.append(')');
         if (!innerAffected) {
@@ -61,7 +62,7 @@ class WhereWrappedKeyword<T, Q, X> implements Keyword<Q> {
         }
 
         appender.mark(2);
-        boolean whereSelectiveAffected = whereSelective != null && appender.append(whereSelective, query, variableConsumer);
+        boolean whereSelectiveAffected = whereSelective != null && appender.append(whereSelective, null, query, variableConsumer);
         if (!whereSelectiveAffected) {
             appender.rollback(2);
             if (innerAffected && !requireBraces) {

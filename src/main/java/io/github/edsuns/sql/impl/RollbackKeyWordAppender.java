@@ -1,5 +1,7 @@
 package io.github.edsuns.sql.impl;
 
+import io.github.edsuns.sql.protocol.Entity;
+
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayDeque;
@@ -11,7 +13,7 @@ import java.util.function.Consumer;
  * @since 2024/3/21 19:57
  */
 @ParametersAreNonnullByDefault
-class RollbackKeyWordAppender<Q> {
+class RollbackKeyWordAppender<T extends Entity, Q> {
     private final StringBuilder sql;
     private final int[] beforeIndex;
 
@@ -21,12 +23,13 @@ class RollbackKeyWordAppender<Q> {
         mark();
     }
 
-    public boolean append(Keyword<Q> keyword, @Nullable Q query, Consumer<Object> variableConsumer) {
+    public boolean append(Keyword<?, Q> keyword, @Nullable T entity, @Nullable Q query, Consumer<Object> variableConsumer) {
         if (query == null) {
             return false;
         }
         Queue<Object> variables = new ArrayDeque<>();
-        boolean affected = keyword.parseIntoSql(sql, variables::add, query);
+        boolean affected = (entity != null && keyword instanceof KeywordWrite)
+                ? ((KeywordWrite) keyword).parseIntoSql(sql, variables::add, entity, query) : keyword.parseIntoSql(sql, variables::add, query);
         if (affected) {
             for (Object val : variables) {
                 if (val != NullKeyword.KEY_WORD) {

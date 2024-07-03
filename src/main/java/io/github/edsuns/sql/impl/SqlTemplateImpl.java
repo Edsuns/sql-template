@@ -16,25 +16,30 @@ import static java.util.Objects.requireNonNull;
  * @since 2024/3/21 10:11
  */
 @ParametersAreNonnullByDefault
-class SqlTemplateImpl<T extends Entity, Q extends Query, R> implements SqlTemplate<T, Q, R> {
+class SqlTemplateImpl<T extends Entity, Q extends Query, R> implements ReadStatement<T, Q, R>, WriteStatement<T, Q, R> {
 
-    private final Queue<Keyword<Q>> keywords;
+    private final Queue<Keyword<T, Q>> keywords;
     @Nullable
     protected final Class<R> resultClass;
 
-    public SqlTemplateImpl(Queue<Keyword<Q>> keywords, @Nullable Class<R> resultClass) {
+    public SqlTemplateImpl(Queue<Keyword<T, Q>> keywords, @Nullable Class<R> resultClass) {
         this.keywords = keywords;
         this.resultClass = resultClass;
+    }
+
+    @Override
+    public Sql generateSql(@Nullable Q query) {
+        return this.generateSql(null, query);
     }
 
     @Override
     public Sql generateSql(@Nullable T entity, @Nullable Q query) {
         Queue<Object> vars = new ArrayDeque<>();
         StringBuilder sql = StringBuilderPool.get();
-        RollbackKeyWordAppender<Q> appender = new RollbackKeyWordAppender<>(sql);
-        for (Keyword<Q> keyword : keywords) {
+        RollbackKeyWordAppender<T, Q> appender = new RollbackKeyWordAppender<>(sql);
+        for (Keyword<T, Q> keyword : keywords) {
             appender.mark();
-            if (!appender.append(keyword, query, vars::add)) {
+            if (!appender.append(keyword, entity, query, vars::add)) {
                 appender.rollback();
             }
         }
@@ -42,10 +47,9 @@ class SqlTemplateImpl<T extends Entity, Q extends Query, R> implements SqlTempla
     }
 
     @Override
-    public R execute(SqlExecutor executor, @Nullable T entity, @Nullable Q query) {
-        Sql sql = generateSql(entity, query);
+    public R execute(SqlExecutor executor, @Nullable Q query) {
+        Sql sql = generateSql(query);
         List<R> result = executor.read(sql.getSqlTemplateString(), sql.getVariables(), requireNonNull(resultClass));
         return result == null || result.isEmpty() ? null : result.get(0);
     }
-
 }

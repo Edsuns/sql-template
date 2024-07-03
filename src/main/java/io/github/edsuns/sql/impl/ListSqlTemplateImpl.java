@@ -18,14 +18,14 @@ import java.util.Queue;
 class ListSqlTemplateImpl<T extends Entity, Q extends Query> extends SqlTemplateImpl<T, Q, List<T>> {
     private final Class<T> entityClass;
 
-    public ListSqlTemplateImpl(Queue<Keyword<Q>> keywords, Class<T> entityClass) {
+    public ListSqlTemplateImpl(Queue<Keyword<T, Q>> keywords, Class<T> entityClass) {
         super(keywords, null);
         this.entityClass = entityClass;
     }
 
     @Override
-    public List<T> execute(SqlExecutor executor, @Nullable T entity, @Nullable Q query) {
-        Sql sql = generateSql(entity, query);
+    public List<T> execute(SqlExecutor executor, @Nullable Q query) {
+        Sql sql = generateSql(query);
         return executor.read(sql.getSqlTemplateString(), sql.getVariables(), entityClass);
     }
 }

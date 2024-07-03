@@ -24,9 +24,9 @@ abstract class ConditionTemplateImpl<T extends Entity, Q extends Query> implemen
     protected final Class<Q> queryClass;
     protected boolean whereSelective = false;
     protected WhereWrappedKeyword<T, Q, ?> where = null;
-    protected Keyword<Q> groupBy = null;
-    protected Keyword<Q> orderBy = null;
-    protected Keyword<Q> limit = null;
+    protected Keyword<T, Q> groupBy = null;
+    protected Keyword<T, Q> orderBy = null;
+    protected Keyword<T, Q> limit = null;
 
     protected ConditionTemplateImpl(Class<T> entityClass, Class<Q> queryClass) {
         this.entityClass = entityClass;

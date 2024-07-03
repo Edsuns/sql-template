@@ -2,7 +2,7 @@ package io.github.edsuns.sql.impl;
 
 import io.github.edsuns.sql.protocol.Entity;
 import io.github.edsuns.sql.protocol.Query;
-import io.github.edsuns.sql.protocol.SqlTemplate;
+import io.github.edsuns.sql.protocol.ReadStatement;
 import io.github.edsuns.sql.protocol.SqlTemplateBuilder;
 import io.github.edsuns.sql.statement.Join;
 import io.github.edsuns.sql.statement.JoinOn;
@@ -90,11 +90,11 @@ public class SelectTemplateImpl<T extends Entity, Q extends Query> extends Condi
         return null;
     }
 
-    private Queue<Keyword<Q>> buildSql(boolean count) {
+    private Queue<Keyword<T, Q>> buildSql(boolean count) {
         if (tableName == null) {
             throw new IllegalStateException();
         }
-        Queue<Keyword<Q>> keywords = new ArrayDeque<>();
+        Queue<Keyword<T, Q>> keywords = new ArrayDeque<>();
         keywords.add(new SelectFromKeyword<>(tableName,
                 count ? "COUNT(1)" : String.join(",", columns),
                 all, distinct, distinctrow));
@@ -122,17 +122,17 @@ public class SelectTemplateImpl<T extends Entity, Q extends Query> extends Condi
     }
 
     @Override
-    public SqlTemplate<T, Q, T> onlyOne() {
+    public ReadStatement<T, Q, T> onlyOne() {
         return new SqlTemplateImpl<>(buildSql(false), entityClass);
     }
 
     @Override
-    public SqlTemplate<T, Q, List<T>> list() {
+    public ReadStatement<T, Q, List<T>> list() {
         return new ListSqlTemplateImpl<>(buildSql(false), entityClass);
     }
 
     @Override
-    public SqlTemplate<T, Q, Long> count() {
+    public ReadStatement<T, Q, Long> count() {
         return new CountSqlTemplateImpl<>(buildSql(true));
     }
 }

@@ -2,7 +2,7 @@ package io.github.edsuns.sql.impl;
 
 import io.github.edsuns.sql.protocol.Entity;
 import io.github.edsuns.sql.protocol.Query;
-import io.github.edsuns.sql.protocol.SqlTemplate;
+import io.github.edsuns.sql.protocol.WriteStatement;
 import io.github.edsuns.sql.statement.UpdateSet;
 import io.github.edsuns.sql.statement.UpdateTemplate;
 import io.github.edsuns.sql.util.SqlUtil;
@@ -22,7 +22,7 @@ public class UpdateTemplateImpl<T extends Entity, Q extends Query> extends Condi
     private String tableName = null;
     private boolean lowPriority = false;
     private boolean ignore = false;
-    private Keyword<Q> setSql = null;
+    private UpdateSetKeyword<T, Q> setSql = null;
 
     public UpdateTemplateImpl(Class<T> entityClass, Class<Q> queryClass) {
         super(entityClass, queryClass);
@@ -35,11 +35,22 @@ public class UpdateTemplateImpl<T extends Entity, Q extends Query> extends Condi
     }
 
     @Override
-    public <X> UpdateTemplate<T, Q> set(Consumer<UpdateSet<T, Q>> setters) {
-        UpdateSetKeyword<T, Q> setSql = new UpdateSetKeyword<>(new ArrayDeque<>(), new ArrayDeque<>());
-        setters.accept(setSql);
-        this.setSql = setSql;
+    public UpdateTemplate<T, Q> set(Consumer<UpdateSet<T, Q>> setters) {
+        setters.accept(makeSetSql());
         return this;
+    }
+
+    @Override
+    public UpdateTemplate<T, Q> setSelective() {
+        makeSetSql().setSelective(true, SqlUtil.getNonStaticFields(entityClass));
+        return this;
+    }
+
+    private UpdateSetKeyword<T, Q> makeSetSql() {
+        if (this.setSql == null) {
+            this.setSql = new UpdateSetKeyword<>(new ArrayDeque<>(), new ArrayDeque<>());
+        }
+        return this.setSql;
     }
 
     @Override
@@ -54,11 +65,11 @@ public class UpdateTemplateImpl<T extends Entity, Q extends Query> extends Condi
         return this;
     }
 
-    public Queue<Keyword<Q>> buildSql() {
+    private Queue<Keyword<T, Q>> buildSql() {
         if (tableName == null) {
             throw new IllegalStateException();
         }
-        Queue<Keyword<Q>> keywords = new ArrayDeque<>();
+        Queue<Keyword<T, Q>> keywords = new ArrayDeque<>();
         keywords.add(new UpdateKeyword<>(tableName, lowPriority, ignore));
         if (setSql == null) {
             throw new IllegalStateException();
@@ -71,7 +82,7 @@ public class UpdateTemplateImpl<T extends Entity, Q extends Query> extends Condi
     }
 
     @Override
-    public SqlTemplate<T, Q, Long> affected() {
+    public WriteStatement<T, Q, Long> affected() {
         return new AffectedSqlTemplateImpl<>(buildSql());
     }
 }

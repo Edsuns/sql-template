@@ -1,5 +1,6 @@
 package io.github.edsuns.sql.impl;
 
+import io.github.edsuns.sql.protocol.Entity;
 import io.github.edsuns.sql.protocol.SqlTemplate;
 import io.github.edsuns.sql.util.SqlUtil;
 
@@ -21,7 +22,7 @@ import static io.github.edsuns.sql.util.SqlUtil.appendSpaceIfNotPresent;
  * @since 2024/3/22 9:46
  */
 @ParametersAreNonnullByDefault
-class WhereSelectiveKeyword<T, Q> implements Keyword<Q> {
+class WhereSelectiveKeyword<T extends Entity, Q> implements Keyword<T, Q> {
     private final Map<String, Field> entityFields;
     private final Map<String, Field> queryFields;
 
@@ -44,15 +45,15 @@ class WhereSelectiveKeyword<T, Q> implements Keyword<Q> {
         for (String columnName : entityFields.keySet()) {
             Field field = queryFields.get(columnName);
             if (field != null) {
-                Object var = SqlUtil.value(query, field);
-                if (var != null) {
+                Object val = SqlUtil.value(query, field);
+                if (val != null) {
                     appendSpaceIfNotPresent(sql);
                     if (affected) {
                         sql.append(KEY_WORD_AND);
                     }
                     appendSpaceIfNotPresent(sql);
                     sql.append(columnName).append('=').append(SqlTemplate.PLACEHOLDER);
-                    variableConsumer.accept(var);
+                    variableConsumer.accept(val);
                     affected = true;
                 }
             }

@@ -10,22 +10,22 @@ import java.util.List;
 @ParametersAreNonnullByDefault
 public interface SqlTemplateBuilder<T extends Entity, Q extends Query> {
 
-    default SqlTemplate<T, Q, T> onlyOne() {
+    default ReadStatement<T, Q, T> onlyOne() {
         // only implemented by SelectTemplate
         throw new UnsupportedOperationException();
     }
 
-    default SqlTemplate<T, Q, List<T>> list() {
+    default ReadStatement<T, Q, List<T>> list() {
         // only implemented by SelectTemplate
         throw new UnsupportedOperationException();
     }
 
-    default SqlTemplate<T, Q, Long> count() {
+    default ReadStatement<T, Q, Long> count() {
         // only implemented by SelectTemplate
         throw new UnsupportedOperationException();
     }
 
-    default SqlTemplate<T, Q, Long> affected() {
+    default WriteStatement<T, Q, Long> affected() {
         // only implemented by UpdateTemplate
         throw new UnsupportedOperationException();
     }

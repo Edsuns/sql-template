@@ -1,5 +1,6 @@
 package io.github.edsuns.sql.impl;
 
+import io.github.edsuns.sql.protocol.Entity;
 import io.github.edsuns.sql.util.SerializableFunction;
 import io.github.edsuns.sql.util.SqlUtil;
 
@@ -18,13 +19,13 @@ import static io.github.edsuns.sql.util.SqlUtil.appendSpaceIfNotPresent;
  * @since 2024/3/21 18:12
  */
 @ParametersAreNonnullByDefault
-class GroupByKeyword<T, Q, X> implements Keyword<Q> {
+class GroupByKeyword<T extends Entity, Q, X> implements Keyword<T, Q> {
 
     protected final Collection<SerializableFunction<T, X>> entityFields;
     @Nullable
-    protected final Keyword<Q> having;
+    protected final Keyword<T, Q> having;
 
-    public GroupByKeyword(Collection<SerializableFunction<T, X>> entityFields, @Nullable Keyword<Q> having) {
+    public GroupByKeyword(Collection<SerializableFunction<T, X>> entityFields, @Nullable Keyword<T, Q> having) {
         this.entityFields = entityFields;
         this.having = having;
     }
