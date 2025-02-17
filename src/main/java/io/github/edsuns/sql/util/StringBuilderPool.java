@@ -12,6 +12,7 @@ public final class StringBuilderPool {
     public static StringBuilder get() {
         StringBuilder stringBuilder = THREAD_STRING_BUILDER.get();
         stringBuilder.setLength(0);
+        // TODO capacity contraction
         return stringBuilder;
     }
 

@@ -35,6 +35,7 @@ public class SqlTemplates {
     }
 
     public static <Q extends Query, X> X nullValue(Q query) {
+        // just returns null
         return null;
     }
 }

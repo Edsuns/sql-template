@@ -7,9 +7,11 @@
 - [x] `onlyOne`, `list`, `affected` result mapping
 - [x] lambda/static-value where conditions
 - [x] lambda/static-value update set conditions
+- [x] composition of statements
+- [x] select specify columns
 - [x] selective where conditions
 - [x] selective set statements
-- [x] optional selective keyword
+- [x] optional selective
 - [ ] join statements
 
 example:
@@ -28,7 +30,22 @@ public interface BookDatabase {
             .list();
     WriteStatement<Book, BookQuery, Long> UPDATE = update(Book.class, BookQuery.class)
             .setSelective()
-            .where(x -> x.equals(Book::getName, BookQuery::getName, true))// query by name selective
+            .where(x -> x.equals(Book::getName, BookQuery::getName, /* selective */ true))
+            .affected();
+    // select specify columns
+    ReadStatement<Book, BookQuery, List<Book>> LIST_BY_DESC_LIKE =
+            select(Book.class, BookQuery.class, singletonList(Book::getId))
+                    .whereSelective()
+                    .list();
+    // composition of statements
+    // here we use the same where conditions in two statements for demonstration
+    Consumer<Where<Book, BookQuery>> BY_DESC_LIKE =
+            x -> x.equals(Book::getDescription, BookQuery::getDescriptionLike);
+    ReadStatement<Book, BookQuery, List<Book>> LIST_ID_BY_DESC_LIKE = select(Book.class, BookQuery.class)
+            .where(BY_DESC_LIKE)
+            .list();
+    WriteStatement<Book, BookQuery, Long> UPDATE_BY_DESC_LIKE = update(Book.class, BookQuery.class)
+            .where(BY_DESC_LIKE)
             .affected();
 }
 

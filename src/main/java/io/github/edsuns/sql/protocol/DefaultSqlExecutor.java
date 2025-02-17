@@ -1,5 +1,6 @@
 package io.github.edsuns.sql.protocol;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Collections;
 import java.util.List;
 import java.util.Queue;
@@ -12,6 +13,7 @@ public class DefaultSqlExecutor {
 
     public static SqlExecutor INSTANCE = new NoImpl();
 
+    @ParametersAreNonnullByDefault
     private static class NoImpl implements SqlExecutor {
         @Override
         public <R> List<R> read(String sql, Queue<Object> variables, Class<R> resultClass) { return Collections.emptyList(); }

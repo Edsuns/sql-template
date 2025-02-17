@@ -8,11 +8,12 @@ import io.github.edsuns.sql.query.BookQuery;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import static io.github.edsuns.sql.SqlTemplates.select;
 import static io.github.edsuns.sql.SqlTemplates.update;
+import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -33,11 +34,11 @@ class SqlTemplateTest {
         assertEquals("SELECT `id`,`name`,`price` FROM `book`",
                 select1.generateSql(query).getSqlTemplateString());
 
-        ReadStatement<Book, BookQuery, Book> select2 = select(Book.class, BookQuery.class)
+        ReadStatement<Book, BookQuery, Book> select2 = select(Book.class, BookQuery.class, singletonList(Book::getId))
                 .whereSelective()
                 .where(x -> x.equals(Book::getName, o -> "test"))
                 .onlyOne();
-        assertEquals("SELECT `id`,`name`,`price` FROM `book` WHERE `name`=?",
+        assertEquals("SELECT `id` FROM `book` WHERE `name`=?",
                 select2.generateSql(query).getSqlTemplateString());
     }
 
@@ -60,7 +61,7 @@ class SqlTemplateTest {
                         .like(Book::getName, BookQuery::getNameLike).or().equals(Book::getPrice, BookQuery::getPrice, true)
                         .or(y -> y.equals(Book::getName, BookQuery::getName))
                 )
-                .groupBy(Arrays.asList(Book::getName, Book::getPrice), having -> having.equals(Book::getName, BookQuery::getName))
+                .groupBy(asList(Book::getName, Book::getPrice), having -> having.equals(Book::getName, BookQuery::getName))
                 .orderBy(x -> x.asc(Book::getId))
                 .limit(BookQuery::getLimit)
                 .list();
@@ -73,7 +74,7 @@ class SqlTemplateTest {
         query.setId(1L);
         query.setName("test");
         query.setNameLike("test");
-        query.setNames(Arrays.asList("1", "2", "3"));
+        query.setNames(asList("1", "2", "3"));
         query.setLimit(15L);
         assertEquals("UPDATE LOW_PRIORITY IGNORE `book` SET `id`=?, `name`=?, `price`=NULL WHERE `name` IN (?,?,?) AND `name` LIKE ?",
                 update.generateSql(null, query).getSqlTemplateString());
@@ -89,7 +90,7 @@ class SqlTemplateTest {
         BookQuery query = new BookQuery();
         query.setId(1L);
         query.setNameLike("test");
-        query.setNames(Arrays.asList("1", "2", "3"));
+        query.setNames(asList("1", "2", "3"));
         query.setLimit(15L);
         ReadStatement<Book, BookQuery, List<Book>> selectSelectiveKeyword = select(Book.class, BookQuery.class).distinct()
                 .whereSelective()
@@ -117,7 +118,7 @@ class SqlTemplateTest {
         BookQuery query = new BookQuery();
         query.setName("test");
         query.setNameLike("test");
-        query.setNames(Arrays.asList("1", "2", "3"));
+        query.setNames(asList("1", "2", "3"));
         WriteStatement<Book, BookQuery, Long> updateSelective = update(Book.class, BookQuery.class).ignore().lowPriority()
                 .setSelective()
                 .set(x -> x.assign(Book::getName, BookQuery::getName))
@@ -134,6 +135,6 @@ class SqlTemplateTest {
         assertEquals("UPDATE LOW_PRIORITY IGNORE `book` SET `id`=?, `name`=? WHERE `name` IN (?,?,?) AND `name` LIKE ?",
                 sql.getSqlTemplateString());
         assertEquals(6, sql.getVariables().size());
-        assertEquals(new ArrayList<>(Arrays.asList(2L, "test", "1", "2", "3", "%test%")), new ArrayList<>(sql.getVariables()));
+        assertEquals(new ArrayList<>(asList(2L, "test", "1", "2", "3", "%test%")), new ArrayList<>(sql.getVariables()));
     }
 }
