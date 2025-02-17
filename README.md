@@ -33,7 +33,7 @@ public interface BookDatabase {
             .where(x -> x.equals(Book::getName, BookQuery::getName, /* selective */ true))
             .affected();
     // select specify columns
-    ReadStatement<Book, BookQuery, List<Book>> LIST_BY_DESC_LIKE =
+    ReadStatement<Book, BookQuery, List<Book>> LIST_ID =
             select(Book.class, BookQuery.class, singletonList(Book::getId))
                     .whereSelective()
                     .list();
